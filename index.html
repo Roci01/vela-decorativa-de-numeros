@@ -32,7 +32,7 @@
       font-weight: bold;
     }
 
-    input[type="text"], input[type="number"], select {
+    input[type="text"], select {
       width: 100%;
       padding: 10px;
       border-radius: 8px;
@@ -99,17 +99,16 @@
     <form id="velaForm">
       <label>Selecciona los números que deseas:</label>
       <div class="numbers-grid">
-        <!-- Checkbox del 0 al 9 -->
-        <label><input type="checkbox" name="numeros" value="0"> 0</label>
-        <label><input type="checkbox" name="numeros" value="1"> 1</label>
-        <label><input type="checkbox" name="numeros" value="2"> 2</label>
-        <label><input type="checkbox" name="numeros" value="3"> 3</label>
-        <label><input type="checkbox" name="numeros" value="4"> 4</label>
-        <label><input type="checkbox" name="numeros" value="5"> 5</label>
-        <label><input type="checkbox" name="numeros" value="6"> 6</label>
-        <label><input type="checkbox" name="numeros" value="7"> 7</label>
-        <label><input type="checkbox" name="numeros" value="8"> 8</label>
-        <label><input type="checkbox" name="numeros" value="9"> 9</label>
+        <label><input type="checkbox" name="numeros" value="0" onchange="actualizarPrecio()"> 0</label>
+        <label><input type="checkbox" name="numeros" value="1" onchange="actualizarPrecio()"> 1</label>
+        <label><input type="checkbox" name="numeros" value="2" onchange="actualizarPrecio()"> 2</label>
+        <label><input type="checkbox" name="numeros" value="3" onchange="actualizarPrecio()"> 3</label>
+        <label><input type="checkbox" name="numeros" value="4" onchange="actualizarPrecio()"> 4</label>
+        <label><input type="checkbox" name="numeros" value="5" onchange="actualizarPrecio()"> 5</label>
+        <label><input type="checkbox" name="numeros" value="6" onchange="actualizarPrecio()"> 6</label>
+        <label><input type="checkbox" name="numeros" value="7" onchange="actualizarPrecio()"> 7</label>
+        <label><input type="checkbox" name="numeros" value="8" onchange="actualizarPrecio()"> 8</label>
+        <label><input type="checkbox" name="numeros" value="9" onchange="actualizarPrecio()"> 9</label>
       </div>
 
       <label>Color de todas las velas:</label>
@@ -133,18 +132,11 @@
         <option value="Caja plateada">Caja plateada (+280 CUP)</option>
       </select>
 
-      <label>Cantidad total de velas (1–10):</label>
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <button type="button" onclick="cambiarCantidad(-1)" style="padding: 5px 10px;">−</button>
-        <input type="number" id="cantidad" min="1" max="10" value="1" style="text-align: center; width: 60px;" />
-        <button type="button" onclick="cambiarCantidad(1)" style="padding: 5px 10px;">+</button>
-      </div>
-
       <label>Tu nombre:</label>
       <input type="text" id="nombre" />
 
-      <div id="precioUnidad">💰 Precio por unidad: 200 CUP</div>
-      <div id="precioTotal">💵 Precio total: 200 CUP</div>
+      <div id="precioUnidad">💰 Precio por vela: 200 CUP</div>
+      <div id="precioTotal">💵 Precio total: 0 CUP</div>
 
       <button type="button" class="submit-button" onclick="enviarWhatsapp()">Enviar por WhatsApp</button>
     </form>
@@ -166,33 +158,21 @@
     });
 
     function actualizarPrecio() {
-      const cantidad = parseInt(document.getElementById('cantidad').value || 1, 10);
+      const numerosSeleccionados = document.querySelectorAll('input[name="numeros"]:checked');
+      const cantidad = numerosSeleccionados.length;
       const empaque = document.getElementById('empaqueRegalo').value;
 
-      let extraEmpaque = empaque === "Caja plateada" ? precioCajaPlateada : 0;
-      let total = (precioUnidad * cantidad) + extraEmpaque;
+      const extraEmpaque = empaque === "Caja plateada" ? precioCajaPlateada : 0;
+      const total = (precioUnidad * cantidad) + extraEmpaque;
 
-      document.getElementById("precioUnidad").textContent = "💰 Precio por unidad: " + precioUnidad + " CUP";
+      document.getElementById("precioUnidad").textContent = "💰 Precio por vela: " + precioUnidad + " CUP";
       document.getElementById("precioTotal").textContent = "💵 Precio total: " + total + " CUP";
-    }
-
-    function cambiarCantidad(delta) {
-      const input = document.getElementById('cantidad');
-      let valor = parseInt(input.value || 1, 10);
-      const min = parseInt(input.min, 10);
-      const max = parseInt(input.max, 10);
-      const nuevoValor = valor + delta;
-
-      if (nuevoValor >= min && nuevoValor <= max) {
-        input.value = nuevoValor;
-        actualizarPrecio();
-      }
     }
 
     function enviarWhatsapp() {
       const numeros = Array.from(document.querySelectorAll('input[name="numeros"]:checked')).map(n => n.value);
+      const cantidad = numeros.length;
       const color = document.getElementById('color').value.trim();
-      const cantidad = parseInt(document.getElementById('cantidad').value.trim(), 10);
       const nombre = document.getElementById('nombre').value.trim();
       const empaque = document.getElementById('empaqueRegalo').value;
 
@@ -203,11 +183,6 @@
 
       if (!color) {
         alert("Selecciona un color.");
-        return;
-      }
-
-      if (!cantidad || cantidad < 1 || cantidad > 10) {
-        alert("Ingresa una cantidad válida.");
         return;
       }
 
